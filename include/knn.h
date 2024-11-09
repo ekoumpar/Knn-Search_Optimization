@@ -2,6 +2,7 @@
 #define KNN_H
 
 #include <stddef.h>
+#include "matio.h"
 
 typedef struct {
     double* data;
