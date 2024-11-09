@@ -6,7 +6,7 @@ CFLAGS = -I../include -I/usr/include/openblas -fopenmp
 LDFLAGS = -L/usr/local/lib   -lmatio
 
 # Source files
-SRCS = main.c randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c 
+SRCS = main.c randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c
 
 # Object files (replace .c with .o)
 OBJS = $(SRCS:.c=.o)
