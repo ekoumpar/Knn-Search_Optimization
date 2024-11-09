@@ -11,7 +11,7 @@ int main(){
     
     Matrix C, Q, D, K;
     size_t k;
-    const char* filename = "max.mat";
+    const char* filename = "data.mat";
     mat_t *file = NULL;
 
     
