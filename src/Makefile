@@ -2,10 +2,11 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = -I../include -I/usr/include/openblas -fopenmp
+CFLAGS = -I../include -I/usr/include/openblas -fopenmp 
+LDFLAGS = -L/usr/local/lib   -lmatio
 
 # Source files
-SRCS = main.c randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c
+SRCS = main.c randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c 
 
 # Object files (replace .c with .o)
 OBJS = $(SRCS:.c=.o)
@@ -18,7 +19,7 @@ all: $(TARGET)
 
 # Link object files to create the executable
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^ -lopenblas -fopenmp -lm # Add -fopenmp here
+	$(CC) -o $@ $^ $(LDFLAGS) -lopenblas -fopenmp -lm # Add -fopenmp here
 
 # Compile source files to object files
 %.o: %.c
@@ -30,3 +31,4 @@ clean:
 
 # Specify phony targets
 .PHONY: all clean
+
