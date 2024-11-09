@@ -13,6 +13,9 @@ typedef struct {
 void createMatrix(Matrix* matrix, size_t points, size_t dimensions);
 void randomMatrix(Matrix* matrix, size_t points, size_t dimensions);
 void printMatrix(const Matrix* matrix);
+void OpenFile(mat_t** file, const char* filename);
+void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
+void CloseFile(mat_t** file);
 
 void quickSelect(double* arr, int low, int high, int k, double* kneighbour);
 void swap(double* a, double* b);
