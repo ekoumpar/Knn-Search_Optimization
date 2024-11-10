@@ -11,7 +11,7 @@ int main(){
     
     Matrix C, Q, D, K;
     size_t k;
-    const char* filename="DataFiles/small.mat";
+    const char* filename="small.mat";
     mat_t *file = NULL;
 
     OpenFile(&file, filename);
