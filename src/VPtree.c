@@ -10,6 +10,7 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
 
     if (N == 0) {
         (*node) = NULL;
+        free(matrix->data);
         return;
     }
 
@@ -34,6 +35,7 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
         (*node)->left = NULL;
         (*node)->right = NULL;
         (*node)->radius = 0;
+        free(matrix->data);
         return;
     }
     
@@ -47,7 +49,9 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     Matrix distances;
     createArray(&distances, N - 1, 1);
 
+    
     //ignore first point of array
+    double* data_Matrix = matrix->data;
     if (matrix->data != NULL) {
         matrix->data += dim;
         matrix->rows = N - 1;
@@ -95,6 +99,7 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     printf("\n");
 
     free(distances.data);
+    free(data_Matrix);
 
     //node initiallize
     (*node)->radius = median;
@@ -102,16 +107,11 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     (*node)->right = NULL;
 
     //copy of data pointers for deallocation
-    double* data_left = Left.data;
-    double* data_right = Right.data;
 
     
     buildVPTree(&Left, &(*node)->left);
     buildVPTree(&Right, &(*node)->right);
 
-    
-    free(data_left);
-    free(data_right);
 
     return;
     
