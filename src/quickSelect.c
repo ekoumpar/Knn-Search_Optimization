@@ -76,5 +76,29 @@ void quickSort(double *arr, int low, int high) {
         quickSort(arr, low, pivotIndex - 1); 
         quickSort(arr, pivotIndex + 1, high);
     }
+
 }
 
+double quickMedian(double* arr, int low, int high) {
+    
+    double* copy = NULL;
+    double median;
+    copy = (double*)malloc(sizeof(double) * (high + 1));
+    if (copy == NULL) {
+        printf("Problem with memory allocation in quickMedian");
+    }
+    for (int i = 0; i < high + 1; i++) {
+        copy[i] = arr[i];
+    }
+    quickSort(copy, low, high);
+    if ((high + 1) % 2 == 0) {
+       median = (copy[high / 2] + copy[high / 2 + 1]) / 2;
+       free(copy);
+    return median;
+    }
+    else
+      median = copy[(high + 1) / 2];
+    free(copy);
+    return median;    
+
+}    
