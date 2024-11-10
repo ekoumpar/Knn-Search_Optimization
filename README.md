@@ -1,2 +1,2 @@
-# V0 implementation of HW1
-The implementation addresses the problem serially, ensuring precision without relying on approximations.
+# VP Tree implementation of knn search
+The implementation addresses the problem by making a Vantage Point Tree for searching.
