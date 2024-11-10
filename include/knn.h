@@ -25,4 +25,7 @@ int partition(double* arr, int low, int high);
 
 void distanceBlas(const Matrix* C, const Matrix* Q, Matrix* D);
 
+void* knnSearchThread(void* arg);
+void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K);
+
 #endif
