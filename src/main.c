@@ -11,7 +11,7 @@ int main(){
     
     Matrix C, Q, D, K;
     size_t k;
-    const char* filename="small.mat";
+    const char* filename="DataFiles/small.mat";
     mat_t *file = NULL;
 
     OpenFile(&file, filename);
@@ -23,9 +23,8 @@ int main(){
     printf("---------------Corpus-Set----------------");
     printMatrix(&C);
     
-    double* data_C = C.data;
+   //after bulidVPTree C is deleted!
     VPNode* Corpus = NULL;
-
     buildVPTree(&C, &Corpus);
 
     //for debugging
@@ -33,7 +32,6 @@ int main(){
     printVPTree(Corpus, 0, C.cols);
     printf("\n\n");
 
-    free(data_C);//delete C
 
     
     readMatrix(&Q, "QUERY", file);
