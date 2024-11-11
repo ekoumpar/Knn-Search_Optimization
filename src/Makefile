@@ -29,6 +29,10 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
+# Run the program with LD_LIBRARY_PATH set
+run: $(TARGET)
+	LD_LIBRARY_PATH=/usr/local/lib ./$(TARGET)
+
 # Specify phony targets
-.PHONY: all clean
+.PHONY: all clean run
 

@@ -19,7 +19,7 @@ typedef struct VPNode {
 
 
 
-void createArray(Matrix* matrix, size_t points, size_t dimensions);
+void createMatrix(Matrix* matrix, size_t points, size_t dimensions);
 void randomMatrix(Matrix* matrix, size_t points, size_t dimensions);
 void printMatrix(const Matrix* matrix);
 void OpenFile(mat_t** file, const char* filename);

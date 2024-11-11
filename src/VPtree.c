@@ -1,11 +1,9 @@
 #include <../include/knn.h>
-
 #include <stdio.h>
-
+#include <omp.h>
 
 void buildVPTree(Matrix* matrix, VPNode** node) {
-
-    int dim =(int) matrix->cols;
+    int dim = (int)matrix->cols;
     int N = (int)matrix->rows;
 
     if (N == 0) {
@@ -41,15 +39,14 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     
     //distanceBlas
     Matrix Vpoint;
-    createArray(&Vpoint, 1, dim);
+    createMatrix(&Vpoint, 1, dim);
     for (int i = 0; i < dim; i++) {
         Vpoint.data[i] = (*node)->point[i];
     }
     
     Matrix distances;
-    createArray(&distances, N - 1, 1);
+    createMatrix(&distances, N - 1, 1);
 
-    
     //ignore first point of array
     double* data_Matrix = matrix->data;
     if (matrix->data != NULL) {
@@ -61,7 +58,7 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     free(Vpoint.data);
 
     //calculate median of distances
-    double median= quickMedian(distances.data, 0, N - 2);
+    double median = quickMedian(distances.data, 0, N - 2);
 
     //for debugging
     printf("distances %d: ", N);
@@ -70,24 +67,21 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     }
     printf("  median :%f", median);
 
-
-    //seperate between left and right nodes
+    //separate between left and right nodes
     Matrix Left, Right;
-    createArray(&Left, N - 1, dim);
-    createArray(&Right, N - 1, dim);
-    
+    createMatrix(&Left, N - 1, dim);
+    createMatrix(&Right, N - 1, dim);
 
     int left_count = 0, right_count = 0;
-    for (int i = 0; i < (N-1) ; i++) {
+    for (int i = 0; i < (N - 1); i++) {
         if (distances.data[i] <= median) {
             for (int j = 0; j < dim; j++) {
                 Left.data[left_count * dim + j] = matrix->data[i * dim + j];
             }
             left_count++;
-        }
-        else {
+        } else {
             for (int j = 0; j < dim; j++) {
-                Right.data[right_count * dim + j] = matrix->data[i * dim + j]; 
+                Right.data[right_count * dim + j] = matrix->data[i * dim + j];
             }
             right_count++;
         }
@@ -101,52 +95,55 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     free(distances.data);
     free(data_Matrix);
 
-    //node initiallize
+    //node initialize
     (*node)->radius = median;
     (*node)->left = NULL;
     (*node)->right = NULL;
 
     //copy of data pointers for deallocation
 
-    
-    buildVPTree(&Left, &(*node)->left);
-    buildVPTree(&Right, &(*node)->right);
+    #pragma omp parallel
+    {
+        #pragma omp single nowait
+        {
+            #pragma omp task
+            buildVPTree(&Left, &(*node)->left);
 
+            #pragma omp task
+            buildVPTree(&Right, &(*node)->right);
+        }
+    }
 
     return;
-    
 }
 
-
 void freeVPTree(VPNode** node) {
+    if (*node == NULL) return;
 
-	if (*node == NULL) return;
+    freeVPTree(&(*node)->left);
+    freeVPTree(&(*node)->right);
 
-	freeVPTree(&(*node)->left);
-	freeVPTree(&(*node)->right);
-
-	free((*node)->point);
-	free(*node);
+    free((*node)->point);
+    free(*node);
     *node = NULL;
 }
 
-void printVPTree( VPNode* node, int level, int dim) {
-	if (node == NULL) return;
+void printVPTree(VPNode* node, int level, int dim) {
+    if (node == NULL) return;
 
-	// levels of tree as tabs
-	for (int i = 0; i < level; i++) {
-		printf("    ");
-	}
+    // levels of tree as tabs
+    for (int i = 0; i < level; i++) {
+        printf("    ");
+    }
 
-	// print point and radius of node 
-	printf("Point: (");
-	for (int i = 0; i < dim; i++) {
-		printf("%.2f", node->point[i]);
-		if (i < dim - 1) printf(", ");
-	}
-	printf("), Radius: %f\n", node->radius);
-     
-   
-	printVPTree(node->left, level + 1, dim);
-	printVPTree(node->right, level + 1, dim);
+    // print point and radius of node 
+    printf("Point: (");
+    for (int i = 0; i < dim; i++) {
+        printf("%.2f", node->point[i]);
+        if (i < dim - 1) printf(", ");
+    }
+    printf("), Radius: %f\n", node->radius);
+
+    printVPTree(node->left, level + 1, dim);
+    printVPTree(node->right, level + 1, dim);
 }
