@@ -11,7 +11,7 @@ int main(){
     
     Matrix C, Q, D, K;
     size_t k;
-    const char* filename="data.mat";
+    const char* filename="small.mat";
     mat_t *file = NULL;
 
     OpenFile(&file, filename);
@@ -21,16 +21,10 @@ int main(){
 
     
     printf("Enter the number of nearest neighbours: ");
-     if (scanf("%zu", &k) != 1) {
-          printf("Invalid input for 'k'.\n");
-          return -1;
-        }
-    
-   
-    size_t corpus = C.rows;
-    size_t query = Q.rows;
-    //createMatrix(&D, query, corpus);
-    createMatrix(&K, query, k);
+    if (scanf("%zu", &k) != 1) {
+        printf("Invalid input for 'k'.\n");
+        return -1;
+    }
    
 
     printf("---------------Corpus-Set----------------");
@@ -40,30 +34,16 @@ int main(){
     printf("---------------Query-Set-----------------");
     printMatrix(&Q);
     
-    //Calculate Distances
-    // distanceBlas(&C, &Q, &D);
-    // printf("---------------Distances-----------------");
-    // printMatrix(&D);
-        
-    // //Sorting of kth elements
-    // int rows = (int)D.rows;
-    // int dCols = (int)D.cols;
-    // int kCols = (int)K.cols; 
-    // for (int i = 0; i < rows; i++) {
-    //     quickSelect(D.data + i*dCols, 0, dCols - 1, kCols, K.data + i*kCols);
-    // }
+    //Calculate k nearest neighbours
+    createMatrix(&K, Q.rows, k);
     knnSearch(&C, &Q, k, &K);
 
     printf("---------------K neighbours----------------");
     printMatrix(&K);
-    
- 
-
   
     free(K.data);
     free(C.data);
     free(Q.data);
-    //free(D.data);
     
     CloseFile(&file);
     return 0;
