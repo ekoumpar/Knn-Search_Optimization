@@ -11,7 +11,7 @@ int main(){
     
     Matrix C, Q, D, K;
     size_t k;
-    const char* filename="small.mat";
+    const char* filename="large.mat";
     mat_t *file = NULL;
 
     OpenFile(&file, filename);
@@ -27,19 +27,23 @@ int main(){
     }
    
 
-    printf("---------------Corpus-Set----------------");
-    printMatrix(&C);
+    // printf("---------------Corpus-Set----------------");
+    // printMatrix(&C);
     
     
-    printf("---------------Query-Set-----------------");
-    printMatrix(&Q);
+    // printf("---------------Query-Set-----------------");
+    // printMatrix(&Q);
     
     //Calculate k nearest neighbours
     createMatrix(&K, Q.rows, k);
+    double start_time = omp_get_wtime();
     knnSearch(&C, &Q, k, &K);
+    double end_time = omp_get_wtime();
 
     printf("---------------K neighbours----------------");
     printMatrix(&K);
+
+    printf("Time taken for knnSearch: %f seconds\n", end_time - start_time);
   
     free(K.data);
     free(C.data);
