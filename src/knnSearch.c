@@ -77,28 +77,25 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
 
     int rows =0;
     for (int i = 0; i < qThreads; i++) {
-        int addRows =0;
+    
+        int addRows = (int)thread_data[i*cThreads].K->rows;
+        Matrix allK;
+        createMatrix(&allK, addRows, k*cThreads);
+
         for (int j = 0; j < cThreads; j++) {
             pthread_join(threads[i*cThreads+j], NULL);
-
-            if(j==0){
-                addRows = (int)thread_data[i*cThreads+j].K->rows;
-                for(int n=rows; n<(rows + addRows); n++){
-                    for(int l=0; l<k; l++){
-                        K->data[n*k + l] = thread_data[i*cThreads+j].K->data[(n-rows)*k + l];
-                    }
-                }
-            }
-            else{
-                for(int n=rows; n<(rows + addRows); n++){
-                    for(int l=0; l<k; l++){
-                        if(K->data[n*k + l] > thread_data[i*cThreads+j].K->data[(n-rows)*k + l]){
-                            K->data[n*k + l] = thread_data[i*cThreads+j].K->data[(n-rows)*k + l];
-                        }
-                    }
+            for(int n=0; n<addRows; n++){
+                for(int l=0; l<k; l++){
+                    allK.data[n*k*cThreads + j*k + l] = thread_data[i*cThreads+j].K->data[n*k + l];
                 }
             }
         }
+
+        for(int n=0; n<addRows; n++){
+            quickSelect(allK.data + n*k*cThreads, 0, k*cThreads - 1, k, K->data + (rows + n)*k);
+        }
+
+        free(allK.data);
         rows += addRows;
     }
 
