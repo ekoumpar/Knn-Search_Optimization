@@ -1,4 +1,4 @@
-#include <../include/knn.h>
+#include <../include/functions_c.h>
 
 #include <stdio.h>
 

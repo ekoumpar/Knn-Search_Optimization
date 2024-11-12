@@ -1,4 +1,4 @@
-#include <../include/knn.h>
+#include <../include/functions_c.h>
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>
@@ -61,12 +61,12 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     //calculate median of distances
     double median = quickMedian(distances.data, 0, N - 2);
 
-    //for debugging
-    printf("distances %d: ", N);
-    for (int i = 0; i < N - 1; i++) {
-        printf("%f  ", distances.data[i]);
-    }
-    printf("  median :%f", median);
+    // //for debugging
+    // printf("distances %d: ", N);
+    // for (int i = 0; i < N - 1; i++) {
+    //     printf("%f  ", distances.data[i]);
+    // }
+    // printf("  median :%f", median);
 
     //separate between left and right nodes
     Matrix Left, Right;
@@ -90,8 +90,8 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     Left.rows = left_count;
     Right.rows = right_count;
 
-    //debugging
-    printf("\n");
+    // //debugging
+    // printf("\n");
 
     free(distances.data);
     free(data_Matrix);
@@ -116,47 +116,6 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     }
 
     return;
-}
-
-void searchVPTree(VPNode* node, double* query, int dim, Matrix* distances, int index, double threshold) {
-
-    if (node == NULL) return;
-
-    //Calculate distance between query and node->point
-    double distance = 0.0;
-    for (int i = 0; i < dim; i++) {
-        distance += (query[i] - node->point[i]) * (query[i] - node->point[i]);
-    }
-    distance = sqrt(distance);
-
-    double upperBound = node->radius + threshold;
-    double lowerBound = node->radius - threshold < 0 ? 0.5 : node->radius - threshold;
-
-    if(node->radius == 0.0){
-        distances->data[index] = distance;
-        return;
-    }
-
-    if(upperBound < distance){
-        distances->data[index] = distance;
-        index++;
-        //Go to the right child
-        searchVPTree(node->right, query, dim, distances, index, threshold);
-    }
-    else if(lowerBound > distance){
-        distances->data[index] = distance;
-        index++;
-        //Go to the left child
-        searchVPTree(node->left, query, dim, distances, index, threshold);
-    }
-    else {
-        distances->data[index] = distance;
-        index++;
-        //Go to the left child
-        searchVPTree(node->left, query, dim, distances, index, threshold);
-        //Go to the right child
-        searchVPTree(node->right, query, dim, distances, index, threshold);
-    }
 }
 
 void freeVPTree(VPNode** node) {

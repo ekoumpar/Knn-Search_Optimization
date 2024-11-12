@@ -1,15 +1,20 @@
 # Compiler
 CC = gcc
+CXX = g++
 
 # Compiler flags
 CFLAGS = -I../include -I/usr/include/openblas -fopenmp 
-LDFLAGS = -L/usr/local/lib   -lmatio
+CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp 
+LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm
 
 # Source files
-SRCS = main.c randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c
+C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c
+CPP_SRCS = main.cpp searchVPtree.cpp
 
-# Object files (replace .c with .o)
-OBJS = $(SRCS:.c=.o)
+# Object files
+C_OBJS = $(C_SRCS:.c=.o)
+CPP_OBJS = $(CPP_SRCS:.cpp=.o)
+OBJS = $(C_OBJS) $(CPP_OBJS)
 
 # Target executable
 TARGET = knn
@@ -19,11 +24,14 @@ all: $(TARGET)
 
 # Link object files to create the executable
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS) -lopenblas -fopenmp -lm # Add -fopenmp here
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-# Compile source files to object files
+# Pattern rules for compiling C and C++ source files to object files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean up generated files
 clean:
@@ -35,4 +43,3 @@ run: $(TARGET)
 
 # Specify phony targets
 .PHONY: all clean run
-
