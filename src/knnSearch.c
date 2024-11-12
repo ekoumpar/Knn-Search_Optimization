@@ -40,8 +40,8 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
     int dim = (int)C->cols;
 
     
-    int qThreads = 2;
-    int cThreads = 2;
+    int qThreads = 5;
+    int cThreads = 5;
     int rows_per_thread_Q = M / qThreads;
     int rows_per_thread_C = N / cThreads;
 
