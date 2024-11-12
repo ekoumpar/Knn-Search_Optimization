@@ -36,8 +36,10 @@ void readMatrix(Matrix *matrix,const char* matrixName, mat_t *file) {
         printf("Memory allocation for array->data failed.\n");
         Mat_VarFree(arrayPr);
     }
-    for (int i = 0; i < matrix->rows * matrix->cols; i++) {
-        matrix->data[i] = dataPr[i];
+    for (int i = 0; i < matrix->rows; i++) {
+        for (int j = 0; j < matrix->cols; j++) {
+            matrix->data[i * matrix->cols + j] = dataPr[j * matrix->rows + i];
+        }
     }
     Mat_VarFree(arrayPr);
 }

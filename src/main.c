@@ -22,53 +22,57 @@ int main(){
     //for debugging
     printf("---------------Corpus-Set----------------");
     printMatrix(&C);
+
+    readMatrix(&Q, "QUERY", file);
+    printf("Enter the number of nearest neighbours: ");
+     if (scanf("%zu", &k) != 1) {
+          printf("Invalid input for 'k'.\n");
+          return -1;
+    }
     
+    printf("---------------Query-Set-----------------");
+    printMatrix(&Q);
+
+    size_t corpus = C.rows;
+    size_t query = Q.rows;
+    // createMatrix(&D, query, corpus);
+    // createMatrix(&K, query, k);
+   
+    // //Calculate Distances
+    // distanceBlas(&C, &Q, &D);
+        
+    // //Sorting of kth elements
+    // int rows = (int)D.rows;
+    // int dCols = (int)D.cols;
+    // int kCols = (int)K.cols; 
+    // for (int i = 0; i < rows; i++) {
+    //     quickSelect(D.data + i*dCols, 0, dCols - 1, kCols, K.data + i*kCols);
+    // }
+
+    // printf("---------------K neighbours----------------");
+    // printMatrix(&K);
+
    //after bulidVPTree C is deleted!
     VPNode* Corpus = NULL;
     buildVPTree(&C, &Corpus);
 
     //for debugging
     printf("\n\n");
-    printVPTree(Corpus, 0, C.cols);
+    printVPTree(Corpus, 0, Q.cols);
     printf("\n\n");
 
-
-    
-    readMatrix(&Q, "QUERY", file);
-    printf("Enter the number of nearest neighbours: ");
-     if (scanf("%zu", &k) != 1) {
-          printf("Invalid input for 'k'.\n");
-          return -1;
-        }
-    printf("---------------Query-Set-----------------");
-    printMatrix(&Q);
-
-    /*
-    size_t corpus = C.rows;
-    size_t query = Q.rows;
-    createArray(&D, query, corpus);
-    createArray(&K, query, k);
-   
-    //Calculate Distances
-    distanceBlas(&C, &Q, &D);
-    printf("---------------Distances-----------------");
-    printMatrix(&D);
-        
-    //Sorting of kth elements
-    int rows = (int)D.rows;
-    int dCols = (int)D.cols;
-    int kCols = (int)K.cols; 
-    for (int i = 0; i < rows; i++) {
-        quickSelect(D.data + i*dCols, 0, dCols - 1, kCols, K.data + i*kCols);
+    //Search for k nearest neighbours
+    for(size_t i = 0; i < Q.rows; i++){
+        Matrix distances;
+        createMatrix(&distances, 1, corpus + 1);
+        searchVPTree(Corpus, Q.data + i*Q.cols, (int)Q.cols, &distances, 0, 30);
+        printf("---------------Distances %zu-----------------", i);
+        printMatrix(&distances);
+        free(distances.data);
     }
-
-    printf("---------------K neighbours----------------");
-    printMatrix(&K);
-    */
-    //free(K.data);
-    //free(D.data);
     
-
+    // free(K.data);
+    // free(D.data);
     free(Q.data);
     freeVPTree(&Corpus);
     CloseFile(&file);

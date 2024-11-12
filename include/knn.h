@@ -27,6 +27,7 @@ void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
 void CloseFile(mat_t** file);
 
 void buildVPTree(Matrix* matrix, VPNode** node);
+void searchVPTree(VPNode* node, double* query, int dim, Matrix* distances, int index, double threshold);
 void freeVPTree(struct VPNode** node);
 void printVPTree(struct VPNode* node, int level, int dim);
 

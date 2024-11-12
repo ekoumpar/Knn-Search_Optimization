@@ -1,5 +1,6 @@
 #include <../include/knn.h>
 #include <stdio.h>
+#include <math.h>
 #include <omp.h>
 
 void buildVPTree(Matrix* matrix, VPNode** node) {
@@ -115,6 +116,47 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     }
 
     return;
+}
+
+void searchVPTree(VPNode* node, double* query, int dim, Matrix* distances, int index, double threshold) {
+
+    if (node == NULL) return;
+
+    //Calculate distance between query and node->point
+    double distance = 0.0;
+    for (int i = 0; i < dim; i++) {
+        distance += (query[i] - node->point[i]) * (query[i] - node->point[i]);
+    }
+    distance = sqrt(distance);
+
+    double upperBound = node->radius + threshold;
+    double lowerBound = node->radius - threshold < 0 ? 0.5 : node->radius - threshold;
+
+    if(node->radius == 0.0){
+        distances->data[index] = distance;
+        return;
+    }
+
+    if(upperBound < distance){
+        distances->data[index] = distance;
+        index++;
+        //Go to the right child
+        searchVPTree(node->right, query, dim, distances, index, threshold);
+    }
+    else if(lowerBound > distance){
+        distances->data[index] = distance;
+        index++;
+        //Go to the left child
+        searchVPTree(node->left, query, dim, distances, index, threshold);
+    }
+    else {
+        distances->data[index] = distance;
+        index++;
+        //Go to the left child
+        searchVPTree(node->left, query, dim, distances, index, threshold);
+        //Go to the right child
+        searchVPTree(node->right, query, dim, distances, index, threshold);
+    }
 }
 
 void freeVPTree(VPNode** node) {
