@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 typedef struct {
     int index;
@@ -39,9 +40,15 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
     int M = (int)Q->rows;
     int dim = (int)C->cols;
 
+    // Get the number of available CPU cores
+    long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
+    if (num_cores == -1) {
+        perror("sysconf");
+        exit(EXIT_FAILURE);
+    }
     
-    int qThreads = 5;
-    int cThreads = 5;
+    int qThreads = (int)(M/2) > (int)num_cores ? (int)num_cores : (int)(M/2);
+    int cThreads = (int)(N/k) > (int)num_cores ? (int)num_cores : (int)(N/k);
     int rows_per_thread_Q = M / qThreads;
     int rows_per_thread_C = N / cThreads;
 
