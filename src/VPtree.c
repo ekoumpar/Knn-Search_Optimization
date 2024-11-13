@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>
+#include <pthread.h>
 
-void buildVPTree(Matrix* matrix, VPNode** node) {
+pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; // Declare and initialize a mutex
+
+void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes) {
     int dim = (int)matrix->cols;
     int N = (int)matrix->rows;
 
@@ -58,6 +61,22 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
     distanceBlas(matrix, &Vpoint, &distances);
     free(Vpoint.data);
 
+    //calculate mean distance between corpus points
+    double localTotalDistance = 0.0;
+    int localTotalNodes = 0;
+
+    #pragma omp parallel for reduction(+:localTotalDistance, localTotalNodes)
+    for(int i = 0; i < (int)distances.rows; i++){
+        localTotalDistance += distances.data[i];
+        localTotalNodes++;
+    }
+
+    // Update the shared variables outside the parallel region
+    pthread_mutex_lock(&mtx);
+    *totalDistance += localTotalDistance;
+    *totalNodes += localTotalNodes;
+    pthread_mutex_unlock(&mtx);
+
     //calculate median of distances
     double median = quickMedian(distances.data, 0, N - 2);
 
@@ -108,10 +127,10 @@ void buildVPTree(Matrix* matrix, VPNode** node) {
         #pragma omp single nowait
         {
             #pragma omp task
-            buildVPTree(&Left, &(*node)->left);
+            buildVPTree(&Left, &(*node)->left, totalDistance, totalNodes);
 
             #pragma omp task
-            buildVPTree(&Right, &(*node)->right);
+            buildVPTree(&Right, &(*node)->right, totalDistance, totalNodes);
         }
     }
 

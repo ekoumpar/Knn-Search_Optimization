@@ -10,7 +10,7 @@ void printMatrix(const Matrix* matrix){
     printf("\n");
     for(size_t i=0; i<rows; i++){
         for(size_t j=0; j<cols; j++){
-            printf("%10.2lf ", A[i*cols + j]);
+            printf("%10.5lf ", A[i*cols + j]);
         }
         printf("\n");
     }

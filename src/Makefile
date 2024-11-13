@@ -5,7 +5,7 @@ CXX = g++
 # Compiler flags
 CFLAGS = -I../include -I/usr/include/openblas -fopenmp 
 CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp 
-LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm
+LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread
 
 # Source files
 C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c

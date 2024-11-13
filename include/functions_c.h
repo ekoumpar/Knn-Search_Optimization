@@ -22,7 +22,7 @@ void OpenFile(mat_t** file, const char* filename);
 void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
 void CloseFile(mat_t** file);
 
-void buildVPTree(Matrix* matrix, VPNode** node);
+void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes);
 void freeVPTree(VPNode** node);
 void printVPTree(struct VPNode* node, int level, int dim);
 

@@ -36,14 +36,17 @@ int main(){
     // printMatrix(&Q);
 
     size_t corpus = C.rows;
-    size_t query = Q.rows;
+
+    //Mean distance calculation
+    double totalDistance = 0.0;
+    int totalNodes = 0;
 
     //Start timer
     double start_time = omp_get_wtime();
 
     //after bulidVPTree C is deleted!
     VPNode* Corpus = NULL;
-    buildVPTree(&C, &Corpus);
+    buildVPTree(&C, &Corpus, &totalDistance, &totalNodes);
 
     // //for debugging
     // printf("\n\n");
@@ -52,11 +55,12 @@ int main(){
 
     //Search for k nearest neighbours
     createMatrix(&K, Q.rows, k);
+    double threshold = (totalDistance / totalNodes) * 0.1;
 
     #pragma omp parallel for
     for(size_t i = 0; i < Q.rows; i++){
         std::vector<double> distances;
-        searchVPTree(Corpus, Q.data + i*Q.cols, (int)Q.cols, distances, 0.3);
+        searchVPTree(Corpus, Q.data + i*Q.cols, (int)Q.cols, distances, threshold);
         quickSelect(distances.data(), 0, distances.size()-1, k, K.data + i*k);
     }
 
@@ -67,6 +71,7 @@ int main(){
     printf("---------------%zu-Nearest-Neighbours-----------------", k);
     printMatrix(&K);
 
+    printf("Threshold: %f\n", threshold);
     printf("Time taken for calculate k neighbours: %f seconds\n", end_time - start_time);
     
     free(Q.data);
