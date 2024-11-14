@@ -9,72 +9,56 @@ void swap(double* a, double* b) {
 }
 
 // Partition function for QuickSelect
-int partition1(double* arr, int low, int high) {
+int partition(double* arr, int low, int high,double *index){
+
     double pivot = arr[high];
     int i = low;
 
     for (int j = low; j < high; j++) {
         if (arr[j] < pivot) {
             swap(&arr[i], &arr[j]);
+            swap(&index[i], &index[j]);
+            
             i++;
+  
         }
     }
+
     swap(&arr[i], &arr[high]);
+    swap(&index[i], &index[high]);
     
     return i;
 }
 
-//Partition function for QuickSort
-int partition2(double* arr, int low, int high) {
-
-    double pivot = arr[high];
-
-    int i = low - 1;
-
-    for (int j = low; j <= high - 1; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            swap(&arr[i], &arr[j]);
-        }
-    }
-    swap(&arr[i + 1], &arr[high]);
-    return i + 1;
-}
 
 // Finds first k elements and sorts them with use of QuickSort
 // returns them in kneighbour array
-
-void quickSelect(double* arr, int low, int high, int k, double* kneighbour) {
+void quickSelect(double* arr, double* index, int low, int high, int k, double* kneighbour, double* kindex){
     if (low <= high) {
         int static place = 0;
+        //initialization
         if (place == 0) {
             place = k;
         }
-        int pivotIndex = partition1(arr, low, high);
 
-        if (pivotIndex-low == k-1) {
-            // When k-th element is found, sort the k-elements array with quickSort
-            // place the sorted array in kneighbour
-            quickSort(arr, 0, place - 1);
+        int pivotIndex = partition(arr, low, high, index);
+
+        //k elements found
+        if (pivotIndex - low == k - 1) {
+     
             for (int i = 0; i < place; i++) {
                 kneighbour[i] = arr[i];
+                kindex[i] = index[i];
             }
+            place = 0;
             return;
         }
 
-        else if (pivotIndex-low>k-1)
-            quickSelect(arr, low, pivotIndex - 1, k, kneighbour);
+        else if (pivotIndex - low > k - 1)
+            quickSelect(arr,index, low, pivotIndex - 1, k, kneighbour,kindex);
         else
-            quickSelect(arr, pivotIndex + 1, high, k - (pivotIndex - low + 1), kneighbour);
+            quickSelect(arr,index, pivotIndex + 1, high, k - (pivotIndex - low + 1), kneighbour, kindex);
     }
     
-}
-
-void quickSort(double *arr, int low, int high) {
-    if (low < high) {
-        int pivotIndex = partition2(arr, low, high);
-        quickSort(arr, low, pivotIndex - 1); 
-        quickSort(arr, pivotIndex + 1, high);
-    }
 }
 
