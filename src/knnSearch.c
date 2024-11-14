@@ -10,14 +10,17 @@ typedef struct {
     Matrix* C;
     Matrix* Q;
     Matrix* K;
+    Matrix* Kindex;
     int k;
+    int cId;
 } ThreadData;
 
 void* knnSearchThread(void* arg){
     ThreadData* thread = (ThreadData*)arg;
 
-    Matrix D;
+    Matrix D, Index;
     createMatrix(&D, thread->Q->rows, thread->C->rows);
+    createMatrix(&Index, 1, thread->C->rows);
 
     //Calculate the distance between each point in Q and C
     distanceBlas(thread->C, thread->Q, &D);
@@ -25,16 +28,19 @@ void* knnSearchThread(void* arg){
     //Find the k nearest neighbors
     int drows = (int)D.rows;
     int dCols = (int)D.cols;
+    int start = thread->cId;
     for (int i = 0; i < drows; i++) {
-        quickSelect(D.data + i*dCols, 0, dCols - 1, thread->k, thread->K->data + i*thread->k);
+        initiallizeMatrix(&Index, thread->C->rows, start+1);
+        quickSelect(D.data + i*dCols,Index.data, 0, dCols - 1, thread->k, thread->K->data + i*thread->k, thread->Kindex->data + i * thread->k);
     }
 
     free(D.data);
+    free(Index.data);
 
     pthread_exit(NULL);
 }
 
-void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
+void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K, Matrix* Kindex){
 
     int N = (int)C->rows;
     int M = (int)Q->rows;
@@ -60,23 +66,28 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
 
             thread_data[i*cThreads+j].index = i*cThreads+j;
 
-            //Initialize matrix c for each tread
+            //Initialize matrix c for each thread
             thread_data[i*cThreads+j].C = (Matrix*)malloc(sizeof(Matrix));
             thread_data[i*cThreads+j].C->data = C->data + j * rows_per_thread_C * dim;
             thread_data[i*cThreads+j].C->rows = (j == cThreads - 1) ? rows_per_thread_C + (N%cThreads) : rows_per_thread_C;
             thread_data[i*cThreads+j].C->cols = dim;
 
-            //Initialize matrix q for each tread
+            //Initialize matrix q for each thread
             thread_data[i*cThreads+j].Q = (Matrix*)malloc(sizeof(Matrix));
             thread_data[i*cThreads+j].Q->data = Q->data + i * rows_per_thread_Q * dim;
             thread_data[i*cThreads+j].Q->rows = (i == qThreads - 1) ? rows_per_thread_Q + (M%qThreads) : rows_per_thread_Q;
             thread_data[i*cThreads+j].Q->cols = dim;
 
-            //Initialize matrix k for each tread
+            //Initialize matrix k for each thread
             thread_data[i*cThreads+j].K = (Matrix*)malloc(sizeof(Matrix));
             createMatrix(thread_data[i*cThreads+j].K, thread_data[i*cThreads+j].Q->rows, k);
 
+            //Initialize matrix kindex for each thread
+            thread_data[i * cThreads + j].Kindex = (Matrix*)malloc(sizeof(Matrix));
+            createMatrix(thread_data[i * cThreads + j].Kindex, thread_data[i * cThreads + j].Q->rows, k);
+
             thread_data[i*cThreads+j].k = k;
+            thread_data[i * cThreads + j].cId = j* rows_per_thread_C;
 
             pthread_create(&threads[i*cThreads+j], NULL, knnSearchThread, (void*)&thread_data[i*cThreads+j]);
         }
@@ -86,23 +97,26 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
     for (int i = 0; i < qThreads; i++) {
     
         int addRows = (int)thread_data[i*cThreads].K->rows;
-        Matrix allK;
+        Matrix allK, allKindex;
         createMatrix(&allK, addRows, k*cThreads);
+        createMatrix(&allKindex, addRows, k * cThreads);
 
         for (int j = 0; j < cThreads; j++) {
             pthread_join(threads[i*cThreads+j], NULL);
             for(int n=0; n<addRows; n++){
                 for(int l=0; l<k; l++){
                     allK.data[n*k*cThreads + j*k + l] = thread_data[i*cThreads+j].K->data[n*k + l];
+                    allKindex.data[n * k * cThreads + j * k + l] = thread_data[i * cThreads + j].Kindex->data[n * k + l];
                 }
             }
         }
 
-        for(int n=0; n<addRows; n++){
-            quickSelect(allK.data + n*k*cThreads, 0, k*cThreads - 1, k, K->data + (rows + n)*k);
+        for (int n = 0; n < addRows; n++) {
+            quickSelect(allK.data + n * k * cThreads, allKindex.data + n * k * cThreads, 0, k * cThreads - 1, k, K->data + (rows + n) * k, Kindex->data + (rows + n) * k);
         }
 
         free(allK.data);
+        free(allKindex.data);
         rows += addRows;
     }
 
@@ -111,5 +125,7 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K){
         free(thread_data[i].Q);
         free(thread_data[i].K->data);
         free(thread_data[i].K);
+        free(thread_data[i].Kindex->data);
+        free(thread_data[i].Kindex);
     }
 }
