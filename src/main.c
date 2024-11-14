@@ -9,7 +9,7 @@
 int main(){
     srand(time(NULL));
     
-    Matrix C, Q, D, K;
+    Matrix C, Q, K, Kindex;
     size_t k;
     const char* filename="large.mat";
     mat_t *file = NULL;
@@ -25,27 +25,23 @@ int main(){
         printf("Invalid input for 'k'.\n");
         return -1;
     }
-   
-
-    // printf("---------------Corpus-Set----------------");
-    // printMatrix(&C);
-    
-    
-    // printf("---------------Query-Set-----------------");
-    // printMatrix(&Q);
     
     //Calculate k nearest neighbours
     createMatrix(&K, Q.rows, k);
+    createMatrix(&Kindex, Q.rows, k);
     double start_time = omp_get_wtime();
-    knnSearch(&C, &Q, k, &K);
+    knnSearch(&C, &Q, k, &K, &Kindex);
     double end_time = omp_get_wtime();
 
     printf("---------------K neighbours----------------");
     printMatrix(&K);
+    printf("--------------- Indexes ----------------");
+    printMatrix(&Kindex);
 
     printf("Time taken for knnSearch: %f seconds\n", end_time - start_time);
   
     free(K.data);
+    free(Kindex.data);
     free(C.data);
     free(Q.data);
     
