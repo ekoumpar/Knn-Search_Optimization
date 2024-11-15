@@ -13,27 +13,29 @@ int main(){
     
     Matrix C, Q, K;
     size_t k;
-    const char* filename="large.mat";
-    mat_t *file = NULL;
+    const char* filename="../hdf5/mnist-784-euclidean.hdf5";
 
-    OpenFile(&file, filename);
-   
-    //get Corpus
-    readMatrix(&C, "CORPUS", file);
+    //Read .hdf5 file
+    if(load_hdf5(filename, "/train", &C) == -1){
+        printf("Error loading matrix C\n");
+        return -1;
+    }
+    if(load_hdf5(filename, "/test", &Q) == -1){
+        printf("Error loading matrix Q\n");
+        return -1;
+    }
 
-    // //for debugging
-    // printf("---------------Corpus-Set----------------");
-    // printMatrix(&C);
+    //Read .mat file
+    // mat_t *file = NULL;
+    // OpenFile(&file, filename);
+    // readMatrix(&C, "CORPUS", file);
+    // readMatrix(&Q, "QUERY", file);
 
-    readMatrix(&Q, "QUERY", file);
     printf("Enter the number of nearest neighbours: ");
      if (scanf("%zu", &k) != 1) {
           printf("Invalid input for 'k'.\n");
           return -1;
     }
-    
-    // printf("---------------Query-Set-----------------");
-    // printMatrix(&Q);
 
     size_t corpus = C.rows;
 
@@ -47,11 +49,6 @@ int main(){
     //after bulidVPTree C is deleted!
     VPNode* Corpus = NULL;
     buildVPTree(&C, &Corpus, &totalDistance, &totalNodes);
-
-    // //for debugging
-    // printf("\n\n");
-    // printVPTree(Corpus, 0, Q.cols);
-    // printf("\n\n");
 
     //Search for k nearest neighbours
     createMatrix(&K, Q.rows, k);
@@ -77,6 +74,9 @@ int main(){
     free(Q.data);
     free(K.data);
     freeVPTree(&Corpus);
-    CloseFile(&file);
+    
+    //Close .mat file
+    //CloseFile(&file);
+
     return 0;
 }

@@ -3,12 +3,12 @@ CC = gcc
 CXX = g++
 
 # Compiler flags
-CFLAGS = -I../include -I/usr/include/openblas -fopenmp 
+CFLAGS = -I../include -I/usr/include/openblas -I/usr/include/hdf5 -fopenmp -lhdf5 
 CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp 
-LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread
+LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread -lhdf5
 
 # Source files
-C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c
+C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c readBenchmark.c
 CPP_SRCS = main.cpp searchVPtree.cpp
 
 # Object files
