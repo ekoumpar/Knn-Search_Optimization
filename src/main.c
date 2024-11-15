@@ -1,7 +1,3 @@
-#include <../include/knn.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 #include <omp.h>
 #include "matio.h"
@@ -13,6 +9,7 @@ int main(){
     size_t k;
     const char* filename="large.mat";
     mat_t *file = NULL;
+    mat_t *wFile = NULL;
 
     OpenFile(&file, filename);
 
@@ -35,11 +32,19 @@ int main(){
 
     printf("---------------K neighbours----------------");
     printMatrix(&K);
-    printf("--------------- Indexes ----------------");
+    printf("----------------Indexes--------------------");
     printMatrix(&Kindex);
 
     printf("Time taken for knnSearch: %f seconds\n", end_time - start_time);
-  
+    
+
+    createFile(&wFile);
+    saveMatrix(&wFile, K.rows, K.cols, K.data, "K");
+    saveMatrix(&wFile, Kindex.rows, Kindex.cols, Kindex.data, "Kindex");
+    CloseFile(&wFile);
+
+
+
     free(K.data);
     free(Kindex.data);
     free(C.data);
