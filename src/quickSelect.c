@@ -50,7 +50,6 @@ void quickSelect(double* arr, double* index, int low, int high, int k, double* k
                 kneighbour[i] = arr[i];
                 kindex[i] = index[i];
             }
-            place = 0;
             return;
         }
 
