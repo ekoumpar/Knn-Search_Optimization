@@ -14,8 +14,10 @@ void createMatrix(Matrix* matrix, size_t points, size_t dimensions);
 void initiallizeMatrix(Matrix* matrix, size_t points, int start);
 void printMatrix(const Matrix* matrix);
 void OpenFile(mat_t** file, const char* filename);
-void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
 void CloseFile(mat_t** file);
+void saveMatrix(mat_t** file, int rows, int cols, double* data, char* name);
+void createFile(mat_t** file);
+void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
 
 void quickSelect(double* arr, double* index, int low, int high, int k, double* kneighbour, double* kindex);
 void swap(double* a, double* b);
