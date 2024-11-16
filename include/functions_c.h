@@ -22,6 +22,8 @@ void OpenFile(mat_t** file, const char* filename);
 void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
 void CloseFile(mat_t** file);
 int load_hdf5(const char* filename, const char* matname, Matrix* matrix);
+void saveMatrix(mat_t** file, int rows, int cols, double* data,const char* name);
+void createFile(mat_t** file);
 
 void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes);
 void freeVPTree(VPNode** node);
