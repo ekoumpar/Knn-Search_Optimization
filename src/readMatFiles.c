@@ -50,3 +50,11 @@ void CloseFile(mat_t** file) {
         printf("Closing file failed!");
     }
 }
+
+void createFile(mat_t** file) {
+
+    *file = Mat_CreateVer("output.mat", NULL, MAT_FT_MAT5);
+    if (*file == NULL) {
+        fprintf(stderr, "Σφάλμα: Αδυναμία δημιουργίας MAT αρχείου.\n");
+    }
+}
