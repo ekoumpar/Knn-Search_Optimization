@@ -13,8 +13,11 @@ int main(){
     
     Matrix C, Q, K;
     size_t k;
-    const char* filename="../hdf5/mnist-784-euclidean.hdf5";
+    mat_t* wFile = NULL;
+    
+    //const char* filename="../hdf5/mnist-784-euclidean.hdf5";
 
+    /*
     //Read .hdf5 file
     if(load_hdf5(filename, "/train", &C) == -1){
         printf("Error loading matrix C\n");
@@ -24,12 +27,14 @@ int main(){
         printf("Error loading matrix Q\n");
         return -1;
     }
+    */
 
     //Read .mat file
-    // mat_t *file = NULL;
-    // OpenFile(&file, filename);
-    // readMatrix(&C, "CORPUS", file);
-    // readMatrix(&Q, "QUERY", file);
+    const char* filename = "../mat/large.mat";
+     mat_t *file = NULL;
+     OpenFile(&file, filename);
+     readMatrix(&C, "CORPUS", file);
+     readMatrix(&Q, "QUERY", file);
 
     printf("Enter the number of nearest neighbours: ");
      if (scanf("%zu", &k) != 1) {
@@ -52,7 +57,8 @@ int main(){
 
     //Search for k nearest neighbours
     createMatrix(&K, Q.rows, k);
-    double threshold = (totalDistance / totalNodes) * 0.1;
+    double threshold = (totalDistance / totalNodes)*0.1 ;
+   
 
     #pragma omp parallel for
     for(size_t i = 0; i < Q.rows; i++){
@@ -70,13 +76,18 @@ int main(){
 
     printf("Threshold: %f\n", threshold);
     printf("Time taken for calculate k neighbours: %f seconds\n", end_time - start_time);
-    
+
+    //save results in output.mat
+    createFile(&wFile);
+    saveMatrix(&wFile, K.rows, K.cols, K.data, "K");
+    CloseFile(&wFile);
+
     free(Q.data);
     free(K.data);
     freeVPTree(&Corpus);
     
     //Close .mat file
-    //CloseFile(&file);
+    CloseFile(&file);
 
     return 0;
 }
