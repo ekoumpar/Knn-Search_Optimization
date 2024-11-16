@@ -8,7 +8,7 @@ CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp
 LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread -lhdf5
 
 # Source files
-C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c readBenchmark.c
+C_SRCS = randomMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c VPtree.c readBenchmark.c saveMatrix.c
 CPP_SRCS = main.cpp searchVPtree.cpp
 
 # Object files
