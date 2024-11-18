@@ -100,7 +100,7 @@ int main(){
     printf("Time taken for calculate k neighbours: %f seconds\n", end_time - start_time);
 
     //save results in output.mat
-    createFile(&wFile);
+    CreateFile(&wFile);
     saveMatrix(&wFile, K.rows, K.cols, K.data, "K");
     saveMatrix(&wFile, Kindex.rows, Kindex.cols, Kindex.data, "Kindex");
     CloseFile(&wFile);
