@@ -2,8 +2,11 @@
 
 #include <vector>
 #include <cmath>
+#include <queue>
+#include <cstdio>
+using namespace std;
 
-void searchVPTree(VPNode* node, double* query, int dim, std::vector<double>& distances, double threshold) {
+void searchVPTree(VPNode* node, double* query, int dim,int k, priority_queue<Neighbor,vector<Neighbor>,Compare>& pq, double threshold) {
 
     if (node == NULL) return;
 
@@ -13,30 +16,34 @@ void searchVPTree(VPNode* node, double* query, int dim, std::vector<double>& dis
         distance += (query[i] - node->point[i]) * (query[i] - node->point[i]);
     }
     distance = sqrt(distance);
-
-    double upperBound = node->radius + threshold;
-    double lowerBound = node->radius - threshold < 0 ? 0.5 : node->radius - threshold;
-
+    
+    if ((int)pq.size() < k) {
+        pq.push(Neighbor{ distance, node->index });
+    }
+    else if (distance < pq.top().distance) {
+        pq.pop();
+        pq.push(Neighbor{ distance, node->index });
+    }
+    //case of a leaf
     if(node->radius == 0.0){
-        distances.push_back(distance);
         return;
     }
 
+    double upperBound = node->radius + threshold;
+    double lowerBound = node->radius - threshold < 0 ? 0.5: node->radius - threshold;
+
     if(upperBound < distance){
-        distances.push_back(distance);
         //Go to the right child
-        searchVPTree(node->right, query, dim, distances, threshold);
+        searchVPTree(node->right, query, dim, k, pq, threshold);
     }
     else if(lowerBound > distance){
-        distances.push_back(distance);
         //Go to the left child
-        searchVPTree(node->left, query, dim, distances, threshold);
+        searchVPTree(node->left, query, dim, k, pq, threshold);
     }
     else {
-        distances.push_back(distance);
         //Go to the left child
-        searchVPTree(node->left, query, dim, distances, threshold);
+        searchVPTree(node->left, query, dim, k, pq, threshold);
         //Go to the right child
-        searchVPTree(node->right, query, dim, distances, threshold);
+        searchVPTree(node->right, query, dim, k, pq, threshold);
     }
 }
