@@ -1,6 +1,6 @@
 #include <../include/functions_c.h>
 
-// Swap function for QuickSelect
+// Swap function for QuickSort
 void swap(double* a, double* b) {
     double temp = *a;
     *a = *b;
