@@ -6,13 +6,15 @@
 
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; // Declare and initialize a mutex
 
-void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes) {
+void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes, int** Kindex) {
+
     int dim = (int)matrix->cols;
     int N = (int)matrix->rows;
 
     if (N == 0) {
         (*node) = NULL;
         free(matrix->data);
+        free(*Kindex);
         return;
     }
 
@@ -30,6 +32,7 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     }
     for (int i = 0; i < dim; i++) {
         (*node)->point[i] = matrix->data[i];
+        (*node)->index = (*Kindex)[0];
     }
 
     //case of a leaf
@@ -38,16 +41,17 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
         (*node)->right = NULL;
         (*node)->radius = 0;
         free(matrix->data);
+        free(*Kindex);
         return;
     }
-    
+
     //distanceBlas
     Matrix Vpoint;
     createMatrix(&Vpoint, 1, dim);
     for (int i = 0; i < dim; i++) {
         Vpoint.data[i] = (*node)->point[i];
     }
-    
+
     Matrix distances;
     createMatrix(&distances, N - 1, 1);
 
@@ -66,10 +70,10 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     int localTotalNodes = 0;
 
     #pragma omp parallel for reduction(+:localTotalDistance, localTotalNodes)
-    for(int i = 0; i < (int)distances.rows; i++){
-        localTotalDistance += distances.data[i];
-        localTotalNodes++;
-    }
+        for (int i = 0; i < (int)distances.rows; i++) {
+            localTotalDistance += distances.data[i];
+            localTotalNodes++;
+        }
 
     // Update the shared variables outside the parallel region
     pthread_mutex_lock(&mtx);
@@ -80,17 +84,11 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     //calculate median of distances
     double median = quickMedian(distances.data, 0, N - 2);
 
-    // //for debugging
-    // printf("distances %d: ", N);
-    // for (int i = 0; i < N - 1; i++) {
-    //     printf("%f  ", distances.data[i]);
-    // }
-    // printf("  median :%f", median);
-
-    //separate between left and right nodes
     Matrix Left, Right;
     createMatrix(&Left, N - 1, dim);
     createMatrix(&Right, N - 1, dim);
+    int* L_kindex = (int*)malloc(sizeof(int) * (N - 1));
+    int* R_kindex = (int*)malloc(sizeof(int) * (N - 1));
 
     int left_count = 0, right_count = 0;
     for (int i = 0; i < (N - 1); i++) {
@@ -98,22 +96,24 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
             for (int j = 0; j < dim; j++) {
                 Left.data[left_count * dim + j] = matrix->data[i * dim + j];
             }
-            left_count++;
-        } else {
+            L_kindex[left_count] = (*Kindex)[i + 1];
+            left_count++; 
+        }
+        else {
             for (int j = 0; j < dim; j++) {
                 Right.data[right_count * dim + j] = matrix->data[i * dim + j];
             }
-            right_count++;
+            R_kindex[right_count] = (*Kindex)[i + 1];
+            right_count++;  
         }
     }
+
     Left.rows = left_count;
     Right.rows = right_count;
-
-    // //debugging
-    // printf("\n");
-
+    
     free(distances.data);
     free(data_Matrix);
+    free(*Kindex);
 
     //node initialize
     (*node)->radius = median;
@@ -121,19 +121,16 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     (*node)->right = NULL;
 
     //copy of data pointers for deallocation
-
     #pragma omp parallel
     {
         #pragma omp single nowait
         {
             #pragma omp task
-            buildVPTree(&Left, &(*node)->left, totalDistance, totalNodes);
-
+                buildVPTree(&Left, &(*node)->left, totalDistance, totalNodes,&L_kindex);
             #pragma omp task
-            buildVPTree(&Right, &(*node)->right, totalDistance, totalNodes);
+                buildVPTree(&Right, &(*node)->right, totalDistance, totalNodes, &R_kindex);
         }
     }
-
     return;
 }
 
@@ -156,10 +153,11 @@ void printVPTree(VPNode* node, int level, int dim) {
         printf("    ");
     }
 
-    // print point and radius of node 
+    // print index,point and radius of node 
+    printf("index %d ", node->index);
     printf("Point: (");
     for (int i = 0; i < dim; i++) {
-        printf("%.2f", node->point[i]);
+        printf("%f", node->point[i]);
         if (i < dim - 1) printf(", ");
     }
     printf("), Radius: %f\n", node->radius);
