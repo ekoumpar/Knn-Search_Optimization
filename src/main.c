@@ -32,10 +32,13 @@ int main(){
     knnSearch(&C, &Q, k, &K, &Kindex);
     double end_time = omp_get_wtime();
 
-    printf("---------------K neighbours----------------");
-    printMatrix(&K);
-    printf("----------------Indexes--------------------");
-    printMatrix(&Kindex);
+    for(int i=0; i < Q.rows; i++){
+        printf("Query %d:\n", i);
+        for(int j=0; j < k; j++){
+            printf("Index: %d, Distance: %f \n", (int)Kindex.data[i*k + j], K.data[i*k + j]);
+        }
+        printf("\n");
+    }
 
     printf("Time taken for knnSearch: %f seconds\n", end_time - start_time);
     
