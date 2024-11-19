@@ -63,7 +63,7 @@ int main(){
     buildVPTree(&C, &Corpus, &totalDistance, &totalNodes,&kindex);
 
     //Search for k nearest neighbours
-    double threshold = (totalDistance / totalNodes)*0.1 ;
+    double threshold = (totalDistance / totalNodes) * 0.1;
     std::vector<std::vector<Neighbor>> allNeighbors(Q.rows); // structure with k nearest neighbours and indexes
 
     #pragma omp parallel for

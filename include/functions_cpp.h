@@ -1,6 +1,10 @@
+#ifndef FUNCTIONS_CPP_H
+#define FUNCTIONS_CPP_H
+
 #include <queue>
 #include <ostream>
 #include <iostream>
+#include "vptree.h"
 
 using namespace std;
 struct Neighbor {
