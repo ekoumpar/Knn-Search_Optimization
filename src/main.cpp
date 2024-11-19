@@ -10,6 +10,11 @@
 #include <iostream>
 #include <queue>
 #include <cstdio>
+#include <cmath>
+
+double thresholdFunc(double x) {
+    return 0.856 / pow(x, 0.233);
+}
 
 int main(){
     srand(time(NULL));
@@ -33,7 +38,7 @@ int main(){
     */
 
     //Read .mat file
-    const char* filename = "../mat/large.mat";
+    const char* filename = "../mat/medium.mat";
      mat_t *file = NULL;
      OpenFile(&file, filename);
      readMatrix(&C, "CORPUS", file);
@@ -63,7 +68,7 @@ int main(){
     buildVPTree(&C, &Corpus, &totalDistance, &totalNodes,&kindex);
 
     //Search for k nearest neighbours
-    double threshold = (totalDistance / totalNodes) * 0.1;
+    double threshold = (totalDistance / totalNodes) * thresholdFunc(corpus);
     std::vector<std::vector<Neighbor>> allNeighbors(Q.rows); // structure with k nearest neighbours and indexes
 
     #pragma omp parallel for
