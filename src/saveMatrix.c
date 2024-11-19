@@ -30,12 +30,4 @@ void saveMatrix(mat_t **file, int rows, int cols, double* data, char * name) {
 
 }
 
-void createFile(mat_t** file) {
-    *file = Mat_CreateVer("output.mat", NULL, MAT_FT_MAT5);
-    if (*file == NULL) {
-        fprintf(stderr, "Error: Problem with creating Mat file.\n");
-        return;
-    }
-}
-
 
