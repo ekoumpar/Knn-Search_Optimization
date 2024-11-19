@@ -18,6 +18,7 @@ void CloseFile(mat_t** file);
 void saveMatrix(mat_t** file, int rows, int cols, double* data, char* name);
 void createFile(mat_t** file);
 void readMatrix(Matrix* matrix, const char* matrixName, mat_t* file);
+int load_hdf5(const char* filename, const char* matname, Matrix* matrix);
 
 void quickSelect(double* arr, double* index, int low, int high, int k, double* kneighbour, double* kindex);
 void swap(double* a, double* b);

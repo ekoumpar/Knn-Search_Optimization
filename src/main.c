@@ -9,14 +9,24 @@ int main(){
     
     Matrix C, Q, K, Kindex;
     size_t k;
-    const char* filename="../mat/large.mat";
-    mat_t *file = NULL;
+    const char* filename="../hdf5/mnist-784-euclidean.hdf5";
     mat_t *wFile = NULL;
 
-    OpenFile(&file, filename);
+    //Read .hdf5 file
+    if(load_hdf5(filename, "/train", &C) == -1){
+        printf("Error loading matrix C\n");
+        return -1;
+    }
+    if(load_hdf5(filename, "/test", &Q) == -1){
+        printf("Error loading matrix Q\n");
+        return -1;
+    }
 
-    readMatrix(&C, "CORPUS", file);
-    readMatrix(&Q, "QUERY", file);
+    //Open mat file
+    // mat_t *file = NULL;
+    // OpenFile(&file, filename);
+    // readMatrix(&C, "CORPUS", file);
+    // readMatrix(&Q, "QUERY", file);
 
     
     printf("Enter the number of nearest neighbours: ");
@@ -55,6 +65,6 @@ int main(){
     free(C.data);
     free(Q.data);
     
-    CloseFile(&file);
+    //CloseFile(&file);
     return 0;
 }
