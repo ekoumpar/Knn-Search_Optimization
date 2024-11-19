@@ -15,13 +15,13 @@ void saveMatrix(mat_t **file, int rows, int cols, double* data, char * name) {
     }
     matvar_t* matvar = Mat_VarCreate(name, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, dataPr, 0);
     if (matvar == NULL) {
-        fprintf(stderr, "Σφάλμα: Αδυναμία δημιουργίας MAT μεταβλητής.\n");
+        fprintf(stderr, "Error: Problem with creating mat variable.\n");
         Mat_Close(*file);
         return ;
     }
 
     if (Mat_VarWrite(*file, matvar, MAT_COMPRESSION_NONE) != 0) {
-        fprintf(stderr, "Σφάλμα: Αδυναμία εγγραφής της μεταβλητής στο MAT αρχείο.\n");
+        fprintf(stderr, "Error: Problem with writing mat variable.\n");
         return;
     }
     free(dataPr);
@@ -30,6 +30,12 @@ void saveMatrix(mat_t **file, int rows, int cols, double* data, char * name) {
 
 }
 
-
+void createFile(mat_t** file) {
+    *file = Mat_CreateVer("output.mat", NULL, MAT_FT_MAT5);
+    if (*file == NULL) {
+        fprintf(stderr, "Error: Problem with creating Mat file.\n");
+        return;
+    }
+}
 
 
