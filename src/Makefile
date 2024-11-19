@@ -2,11 +2,11 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = -I../include -I/usr/include/openblas -fopenmp -pthread
-LDFLAGS = -L/usr/local/lib   -lmatio
+CFLAGS = -I../include -I/usr/include/openblas -fopenmp -pthread -lhdf5
+LDFLAGS = -L/usr/local/lib   -lmatio -lhdf5
 
 # Source files
-SRCS = main.c createMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c knnSearch.c saveMatrix.c
+SRCS = main.c createMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c knnSearch.c saveMatrix.c readBenchmark.c
 
 # Object files (replace .c with .o)
 OBJS = $(SRCS:.c=.o)
