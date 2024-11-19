@@ -10,10 +10,11 @@
 #include <iostream>
 #include <queue>
 #include <cstdio>
-#include <cmath>
 
 double thresholdFunc(double x) {
-    return 0.856 / pow(x, 0.233);
+    double m = (0.1 - 0.5) / (1000000 - 100);
+    double b = 0.5 - m * 100;
+    return m * x + b;
 }
 
 int main(){
@@ -23,9 +24,8 @@ int main(){
     size_t k;
     mat_t* wFile = NULL;
     
-    //const char* filename="../hdf5/mnist-784-euclidean.hdf5";
-
-    /*
+    const char* filename="../hdf5/mnist-784-euclidean.hdf5";
+    
     //Read .hdf5 file
     if(load_hdf5(filename, "/train", &C) == -1){
         printf("Error loading matrix C\n");
@@ -35,14 +35,13 @@ int main(){
         printf("Error loading matrix Q\n");
         return -1;
     }
-    */
 
     //Read .mat file
-    const char* filename = "../mat/medium.mat";
-     mat_t *file = NULL;
-     OpenFile(&file, filename);
-     readMatrix(&C, "CORPUS", file);
-     readMatrix(&Q, "QUERY", file);
+    // const char* filename = "../mat/medium.mat";
+    //  mat_t *file = NULL;
+    //  OpenFile(&file, filename);
+    //  readMatrix(&C, "CORPUS", file);
+    //  readMatrix(&Q, "QUERY", file);
 
     printf("Enter the number of nearest neighbours: ");
      if (scanf("%zu", &k) != 1) {
@@ -68,7 +67,7 @@ int main(){
     buildVPTree(&C, &Corpus, &totalDistance, &totalNodes,&kindex);
 
     //Search for k nearest neighbours
-    double threshold = (totalDistance / totalNodes) * thresholdFunc(corpus);
+    double threshold = (totalDistance / totalNodes) * 0.1;
     std::vector<std::vector<Neighbor>> allNeighbors(Q.rows); // structure with k nearest neighbours and indexes
 
     #pragma omp parallel for
@@ -115,7 +114,7 @@ int main(){
     freeVPTree(&Corpus);
     
     //Close .mat file
-    CloseFile(&file);
+    //CloseFile(&file);
 
     return 0;
 }
