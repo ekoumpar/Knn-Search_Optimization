@@ -1,3 +1,5 @@
+#include <../include/knn.h>
+
 #include <time.h>
 #include <omp.h>
 #include "matio.h"
@@ -7,7 +9,7 @@ int main(){
     
     Matrix C, Q, K, Kindex;
     size_t k;
-    const char* filename="large.mat";
+    const char* filename="../mat/large.mat";
     mat_t *file = NULL;
     mat_t *wFile = NULL;
 
