@@ -7,7 +7,7 @@ There are two implementations of the KNN-Search algorithm:
 
 Each version is implemented in OpenMP, OpenCilk, PTHREADS.
 
-A [Report](knn_search) is available including more details about the methods used in this project.
+A [Report](knn_search.pdf) is available including more details about the methods used in this project.
 
 ## Setup
 ### Installation steps
