@@ -1,10 +1,9 @@
 #include <../include/functions_c.h>
 #include <stdio.h>
 #include <math.h>
-#include <omp.h>
-#include <pthread.h>
+#include <cilk/cilk.h>
+#include <cilk/cilk_api.h>
 
-pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; // Declare and initialize a mutex
 
 void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* totalNodes, int** Kindex) {
 
@@ -69,18 +68,16 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     double localTotalDistance = 0.0;
     int localTotalNodes = 0;
 
-    #pragma omp parallel for reduction(+:localTotalDistance, localTotalNodes)
-        for (int i = 0; i < (int)distances.rows; i++) {
-            localTotalDistance += distances.data[i];
-            localTotalNodes++;
-        }
-
-    // Update the shared variables outside the parallel region
-    pthread_mutex_lock(&mtx);
+    cilk_for(int i = 0; i < (int)distances.rows; i++) {
+        localTotalDistance += distances.data[i];
+        localTotalNodes++;
+    }
+    cilk_sync;  
+   
+    // update 
     *totalDistance += localTotalDistance;
     *totalNodes += localTotalNodes;
-    pthread_mutex_unlock(&mtx);
-
+    
     //calculate median of distances
     double median = quickMedian(distances.data, 0, N - 2);
 
@@ -121,16 +118,10 @@ void buildVPTree(Matrix* matrix, VPNode** node, double* totalDistance, int* tota
     (*node)->right = NULL;
 
     //copy of data pointers for deallocation
-    #pragma omp parallel
-    {
-        #pragma omp single nowait
-        {
-            #pragma omp task
-                buildVPTree(&Left, &(*node)->left, totalDistance, totalNodes,&L_kindex);
-            #pragma omp task
-                buildVPTree(&Right, &(*node)->right, totalDistance, totalNodes, &R_kindex);
-        }
-    }
+    cilk_spawn buildVPTree(&Left, &(*node)->left, totalDistance, totalNodes, &L_kindex);
+    cilk_spawn buildVPTree(&Right, &(*node)->right, totalDistance, totalNodes, &R_kindex);
+
+    cilk_sync;
     return;
 }
 
@@ -165,3 +156,4 @@ void printVPTree(VPNode* node, int level, int dim) {
     printVPTree(node->left, level + 1, dim);
     printVPTree(node->right, level + 1, dim);
 }
+
