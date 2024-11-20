@@ -23,31 +23,36 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K, Matrix* Kinde
     int rows_per_thread_Q = M / qThreads;
     int rows_per_thread_C = N / cThreads;
 
-    #pragma omp parallel for collapse(2) num_threads(qThreads*cThreads)
+    #pragma omp parallel for num_threads(qThreads)
     for(int i=0; i < qThreads; i++){
+
+        Matrix Q_thread;
+
+        //Initialize matrix q for each thread
+        Q_thread.data = Q->data + i * rows_per_thread_Q * dim;
+        Q_thread.rows = (i == qThreads - 1) ? rows_per_thread_Q + (M%qThreads) : rows_per_thread_Q;
+        Q_thread.cols = dim;
+
+        Matrix allK, allKindex;
+        createMatrix(&allK, Q_thread.rows, k*cThreads);
+        createMatrix(&allKindex, Q_thread.rows, k*cThreads);
+        int index = i*k*qThreads;
+
+        #pragma omp parallel for num_threads(cThreads)
         for(int j=0; j<cThreads; j++){
 
-            Matrix C_thread, Q_thread, K_thread, Kindex_thread;
+            Matrix C_thread;
 
             //Initialize matrix c for each thread
             C_thread.data = C->data + j * rows_per_thread_C * dim;
             C_thread.rows = (j == cThreads - 1) ? rows_per_thread_C + (N%cThreads) : rows_per_thread_C;
             C_thread.cols = dim;
 
-            //Initialize matrix q for each thread
-            Q_thread.data = Q->data + i * rows_per_thread_Q * dim;
-            Q_thread.rows = (i == qThreads - 1) ? rows_per_thread_Q + (M%qThreads) : rows_per_thread_Q;
-            Q_thread.cols = dim;
-
-            //Initialize matrix k for each thread
-            createMatrix(&K_thread, Q_thread.rows, k);
-
-            //Initialize matrix kindex for each thread
-            createMatrix(&Kindex_thread, Q_thread.rows, k);
-
-            Matrix D, Index;
+            Matrix D, Index, K_thread, Kindex_thread;
             createMatrix(&D, Q_thread.rows, C_thread.rows);
             createMatrix(&Index, 1, C_thread.rows);
+            createMatrix(&K_thread, Q_thread.rows, k);
+            createMatrix(&Kindex_thread, Q_thread.rows, k);
 
             //Calculate the distance between each point in Q and C
             distanceBlas(&C_thread, &Q_thread, &D);
@@ -56,18 +61,12 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K, Matrix* Kinde
             int drows = (int)D.rows;
             int dCols = (int)D.cols;
             int start = j * rows_per_thread_C;
-            for (int i = 0; i < drows; i++) {
+            for (int m = 0; m < drows; m++) {
                 initiallizeMatrix(&Index, C_thread.rows, start+1);
-                quickSelect(D.data + i*dCols, Index.data, 0, dCols - 1, k, K_thread.data + i*k, Kindex_thread.data + i*k);
-            }
-
-            #pragma omp critical
-            {
-                for (int n = 0; n < Q_thread.rows; n++) {
-                    for (int l = 0; l < k; l++) {
-                        K->data[(i * rows_per_thread_Q + n) * k + l] = K_thread.data[n * k + l];
-                        Kindex->data[(i * rows_per_thread_Q + n) * k + l] = Kindex_thread.data[n * k + l];
-                    }
+                quickSelect(D.data + m*dCols, Index.data, 0, dCols - 1, k, K_thread.data + m*k, Kindex_thread.data + m*k);
+                for(int n=0; n<k; n++){
+                    allK.data[m*k*cThreads + j*k + n] = K_thread.data[m*k + n];
+                    allKindex.data[m*k*cThreads + j*k + n] = Kindex_thread.data[m*k + n];
                 }
             }
 
@@ -76,5 +75,12 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K, Matrix* Kinde
             free(K_thread.data);
             free(Kindex_thread.data);
         }
+
+        for(int m=0; m<Q_thread.rows; m++){
+            quickSelect(allK.data + m*k*cThreads, allKindex.data + m*k*cThreads, 0, k*cThreads - 1, k, K->data + m*k + index, Kindex->data + m*k + index);
+        }
+
+        free(allK.data);
+        free(allKindex.data);
     }
 }
