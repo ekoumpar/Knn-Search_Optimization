@@ -36,7 +36,7 @@ void knnSearch(const Matrix* C, const Matrix* Q, int k, Matrix* K, Matrix* Kinde
         Matrix allK, allKindex;
         createMatrix(&allK, Q_thread.rows, k*cThreads);
         createMatrix(&allKindex, Q_thread.rows, k*cThreads);
-        int index = i*k*qThreads;
+        int index = i*k*rows_per_thread_Q;
 
         #pragma omp parallel for num_threads(cThreads)
         for(int j=0; j<cThreads; j++){
