@@ -1,0 +1,24 @@
+[submodule "V0/V0-OpenCilk"]
+	path = V0/V0-OpenCilk
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V0-OpenCilk
+[submodule "V0/V0-OpenMP"]
+	path = V0/V0-OpenMP
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V0-OpenMP
+[submodule "V0/V0-Pthreads"]
+	path = V0/V0-Pthreads
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V0-Pthreads
+[submodule "V1/V1-Pthreads"]
+	path = V1/V1-Pthreads
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V1-Pthreads
+[submodule "V1/V1-OpenMP"]
+	path = V1/V1-OpenMP
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V1-OpenMP
+[submodule "V1/V1-OpenCilk"]
+	path = V1/V1-OpenCilk
+	url = git@github.com:mariaxarisi/HW1.git
+	branch = V1-OpenCilk
