@@ -1,11 +1,11 @@
 # Compiler
-CC = gcc
-CXX = g++
+CC = clang
+CXX = clang++
 
 # Compiler flags
-CFLAGS = -I../include -I/usr/include/openblas -I/usr/include/hdf5 -fopenmp -lhdf5
-CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp 
-LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread -lhdf5
+CFLAGS = -I../include -I/usr/include/openblas -I/usr/include/hdf5 -fopenmp -lhdf5 -fcilkplus 
+CXXFLAGS = -I../include -I/usr/include/openblas -fopenmp -fcilkplus
+LDFLAGS = -L/usr/local/lib -lmatio -lopenblas -fopenmp -lm -lpthread -lhdf5 -lcilkrts
 
 # Source files
 C_SRCS = createMatrix.c distanceBlas.c quickSort.c readMatFiles.c VPtree.c readBenchmark.c
