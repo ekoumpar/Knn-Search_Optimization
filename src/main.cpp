@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <omp.h>
+#include <cilk/cilk.h>
 #include "matio.h"
 #include <vector>
 #include <iostream>
@@ -70,8 +71,7 @@ int main(){
     double threshold = (totalDistance / totalNodes) * 0.1;
     std::vector<std::vector<Neighbor>> allNeighbors(Q.rows); // structure with k nearest neighbours and indexes
 
-    #pragma omp parallel for
-        for (size_t i = 0; i < Q.rows; i++){
+    cilk_for(size_t i = 0; i < Q.rows; i++){
             using namespace std;
             priority_queue<Neighbor, vector<Neighbor>, Compare> pq;
             searchVPTree(Corpus, Q.data + i * Q.cols, (int)Q.cols, (int)k, pq, threshold);
@@ -85,7 +85,7 @@ int main(){
 
     //End timer
     double end_time = omp_get_wtime();
-    
+
     createMatrix(&K, Q.rows, k);
     createMatrix(&Kindex, Q.rows, k);
     //printing output
@@ -118,3 +118,4 @@ int main(){
 
     return 0;
 }
+
