@@ -1,9 +1,9 @@
 # Compiler
-CC = gcc
+CC = clang
 
 # Compiler flags
-CFLAGS = -I../include -I/usr/include/openblas -fopenmp -pthread -lhdf5
-LDFLAGS = -L/usr/local/lib   -lmatio -lhdf5
+CFLAGS = -I../include -I/usr/include/openblas -fcilkplus -pthread -lhdf5
+LDFLAGS = -L/usr/local/lib -lmatio -lhdf5 -lopenblas -fcilkplus -lm -pthread
 
 # Source files
 SRCS = main.c createMatrix.c printMatrix.c distanceBlas.c quickSelect.c readMatFiles.c knnSearch.c saveMatrix.c readBenchmark.c
@@ -19,20 +19,19 @@ all: $(TARGET)
 
 # Link object files to create the executable
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS) -lopenblas -fopenmp -lm -pthread
+    $(CC) -o $@ $^ $(LDFLAGS)
 
 # Compile source files to object files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+    $(CC) $(CFLAGS) -c $< -o $@
 
 # Clean up generated files
 clean:
-	rm -f $(OBJS) $(TARGET)
+    rm -f $(OBJS) $(TARGET)
 
 # Run the program with LD_LIBRARY_PATH set
 run: $(TARGET)
-	LD_LIBRARY_PATH=/usr/local/lib ./$(TARGET)
+    LD_LIBRARY_PATH=/usr/local/lib ./$(TARGET)
 
 # Specify phony targets
 .PHONY: all clean run
-
