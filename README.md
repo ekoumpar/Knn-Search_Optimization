@@ -7,6 +7,12 @@ There are two implementations of the KNN-Search algorithm:
 
 Each version is implemented in OpenMP, OpenCilk, PTHREADS.
 
+Every implementation has:
+- **src** folder contains implementation of functions
+- **include** folder contains the required header files
+- **mat** folder contains data sets for testing in `.mat` format
+- **outputs** folder contains results from running the code with MNIST or SIFT datasets
+
 A [Report](knn_search.pdf) is available including more details about the methods used in this project.
 
 ## Setup
@@ -59,7 +65,21 @@ const char* filename="../hdf5/mnist-784-euclidean.hdf5";
     }
 */
 ```
-Input file path should be added to `const char* filename="...";` command.
+Input file path should be added to `const char* filename="../path";` command.
+
+### Output
+The matrix of k distances found is printed in terminal and as a deafult a Matfile named `output.mat` is created, in which 
+K (for distances) and Kindex (for indexes) matrices are saved.
+In order to deactivate the last option, comment format shuld be added to the followng section of `main.c` or `main.cpp`
+```C
+/*
+ // Save results in output.mat
+    CreateFile(&wFile);
+    saveMatrix(&wFile, K.rows, K.cols, K.data, "K");
+    saveMatrix(&wFile, Kindex.rows, Kindex.cols, Kindex.data, "Kindex");
+    CloseFile(&wFile);
+*/
+```
 
 ## Testing
 Each version of our project has been tested with the pre-existing datasets [MNIST](https://yann.lecun.com/exdb/mnist/) and [SIFT](http://corpus-texmex.irisa.fr/) obtained from 
