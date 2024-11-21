@@ -34,9 +34,9 @@ make
 ./knn
 ```
 ### Supported inputs
-- Datasets from HDF5 Files (Default)
+- **Datasets from HDF5 Files (Default)**
 
-Turn off section `//read .mat files` with comment format:
+Turn off section `//read .mat files` in `main.c` or `main.cpp` file with comment format:
 ```C
 /*
 //Read .mat file
@@ -47,9 +47,11 @@ readMatrix(&C, "CORPUS", file);
 readMatrix(&Q, "QUERY", file);
 */
 ```
-- Datasets from MatFiles
+- **Datasets from MatFiles**
 
-Turn off line `const char* filename="../hdf5/mnist-784-euclidean.hdf5";` and section`read hdf5 files` with comment format:
+By default, the first dataset should be named CORPUS and the second dataset QUERY. 
+
+Turn off the following section in `main.c` or `main.cpp` with comment format:
  ```C
 /*
 const char* filename="../hdf5/mnist-784-euclidean.hdf5";
@@ -65,7 +67,9 @@ const char* filename="../hdf5/mnist-784-euclidean.hdf5";
     }
 */
 ```
-Input file path should be added to `const char* filename="../path";` command.
+#### Note:
+- Input file path should be added to `const char* filename="../path";` command.
+
 
 ### Output
 The matrix of k distances found is printed in terminal and as a deafult a Matfile named `output.mat` is created, in which 
