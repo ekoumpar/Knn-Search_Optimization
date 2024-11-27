@@ -5,13 +5,13 @@ There are two implementations of the KNN-Search algorithm:
 - [Version 0](V0) for an Accurate Approach
 - [Version 1](V1) for an Approximate Approach
 
-Each version is implemented in OpenMP, OpenCilk, PTHREADS.
+Each version is implemented in OpenMP, OpenCilk and PTHREADS.
 
-Every implementation has:
-- **src** folder contains implementation of functions
-- **include** folder contains the required header files
+Every implementation includes the following:
+- **src** folder contains the source code for functions and algorithms
+- **include** folder holds the required header files
 - **mat** folder contains data sets for testing in `.mat` format
-- **outputs** folder contains results from running the code with MNIST or SIFT datasets
+- **outputs** folder contains outputs files from testing with MNIST or SIFT datasets
 
 A [Report](knn_search.pdf) is available including more details about the methods used in this project.
 
@@ -22,21 +22,44 @@ A [Report](knn_search.pdf) is available including more details about the methods
 git clone https://github.com/username/knn-search.git
 cd knn-search
 ```
-2. Install Dependencies: Ensure all required libraries are installed.
-3. Adjust MakeFile to ensure libraries paths match.
-4. Go to the src directory of the project
-5. Execute the Makefile with the command:
+2. Ensure all libraries that **Makefile** contains are installed.
+3. Adjust **MakeFile** to ensure libraries paths match.
+4. Modify the following command in **main.c** or **main.cpp** file to include the path to the dataset (in **HDF5** format) for testing:
+```C
+const char* filename="../path";
 ```
+
+**Note**: If cloning the repository is not working, follow these steps to download the implementation manually:
+1. Navigate to the version you want (e.g., V0 or V1) from the available files.
+2. Select the desired implementation (e.g., OpenMP, OpenCilk, or PTHREADS).
+3. Click the green **Code** button.
+4. Choose **Download ZIP**.
+5. Extract the downloaded ZIP file to a local directory.
+6. Follow **installation steps 2 and 3**.
+
+### Instructions (Linux or Unix-like Interface)
+1. Navigate to the project's directory:
+```bash
+ cd /path/to/project
+```
+**Note**: Replace ```/path/to/project``` with the actual path to your project on your system.
+
+2. Go to the **src** folder:
+ ```bash
+ cd src
+```
+3. Run the **Makefile**:
+```bash
 make
 ```
-5. Run the Implementation:
-```
+4. Execute the implementation:
+```bash
 ./knn
 ```
 ### Supported inputs
 - **Datasets from HDF5 Files (Default)**
 
-Turn off section `//read .mat files` in `main.c` or `main.cpp` file with comment format:
+"Turn off" the following sections in **main.c** or **main.cpp** file using comment syntax:
 ```C
 /*
 //Read .mat file
@@ -47,11 +70,15 @@ readMatrix(&C, "CORPUS", file);
 readMatrix(&Q, "QUERY", file);
 */
 ```
+```C
+//CloseFile(&file);
+```
+
 - **Datasets from MatFiles**
 
 By default, the first dataset should be named CORPUS and the second dataset QUERY. 
 
-Turn off the following section in `main.c` or `main.cpp` with comment format:
+"Turn off" the following section in **main.c** or **main.cpp** using comment syntax:
  ```C
 /*
 const char* filename="../hdf5/mnist-784-euclidean.hdf5";
@@ -72,9 +99,9 @@ const char* filename="../hdf5/mnist-784-euclidean.hdf5";
 
 
 ### Output
-The matrix of k distances found is printed in terminal and as a deafult a Matfile named `output.mat` is created, in which 
+A matrix of k distances found for every query is printed in terminal and as a default a **Matfile** named **output.mat** is created, in which 
 K (for distances) and Kindex (for indexes) matrices are saved.
-In order to deactivate the last option, comment format shuld be added to the followng section of `main.c` or `main.cpp`
+In order to deactivate the last option, comment syntax should be added to the following section of **main.c** or **main.cpp** files:
 ```C
 /*
  // Save results in output.mat
@@ -92,6 +119,9 @@ Each version of our project has been tested with the pre-existing datasets [MNIS
 The efficiency of our algorithm was measured using two key metrics:
 - **Recall:** This metric evaluates the accuracy of the algorithm in identifying the correct neighbors. A higher recall indicates better performance in terms of accuracy.
 - **Queries per Second (QPS):** This measures the speed of the algorithm, indicating how many queries can be processed per second.
+
+To measure recall we used a function implemented in **MATLAB**, which compares the results between our implementation, saved in **output.mat** and MATLAB's function knnSearch.
+
 ###  V0
 <table>
   <tr>
