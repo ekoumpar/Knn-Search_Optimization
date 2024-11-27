@@ -19,9 +19,16 @@ A [Report](knn_search.pdf) is available including more details about the methods
 ### Installation steps
 1. Clone the repository 
 ```
-git clone https://github.com/username/knn-search.git
-cd knn-search
+git clone https://github.com/mariaxarisi/HW1.git -b branch_name
 ```
+Select one **branch_name**  of the following list based on the implementation you want to execute:
+- V0-OpenCilk
+- V0-OpenMP
+- V0-Pthreads
+- V1-OpenCilk
+- V1-OpenMP
+- V1-Pthreads
+
 2. Ensure all libraries that **Makefile** contains are installed.
 3. Adjust **MakeFile** to ensure libraries paths match.
 4. Modify the following command in **main.c** or **main.cpp** file to include the path to the dataset (in **HDF5** format) for testing:
