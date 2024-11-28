@@ -2,8 +2,8 @@
 This project aims to compute the K-Nearest Neighbors from a QUERY dataset to a CORPUS dataset, known as Knn-Search Problem.
 ## Description
 There are two implementations of the KNN-Search algorithm:
-- [Version 0](V0) for an Accurate Approach
-- [Version 1](V1) for an Approximate Approach
+- **V0 Version** for an Accurate Approach
+- **V1 Version** for an Approximate Approach
 
 Each version is implemented in OpenMP, OpenCilk and PTHREADS.
 
