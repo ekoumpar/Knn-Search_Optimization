@@ -174,3 +174,13 @@ To measure recall we used a function implemented in **MATLAB**, which compares t
 
 **Note for V1:** Depending on the desired trade-off between accuracy and performance, there is a function that can be adjusted accordingly.
 In other words higher accuracy can be achieved at the cost of slower execution.
+
+**Results depending on threshold**
+
+|  V1-Pthreads - MNIST | mean*0.1     | mean*0.2     | mean*0.25    | mean*0.3     | 
+|--------------------|--------------|--------------|--------------|--------------|
+|   Recall (%)       | 4.02%        | 28.5%        | 49%          | 68.7%        | 
+| Queries/second     | 530          | 128          | 83           | 60           | 
+
+
+
